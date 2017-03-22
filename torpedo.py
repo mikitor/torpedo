@@ -1,118 +1,136 @@
 import string
 import os
 
+
 # creating the boards
-f = [[0 for row in range(0,10)] for col in range(0,10)]
-s = [[0 for row in range(0,10)] for col in range(0,10)]
+def creating_boards():
+    first_player_board = [[0 for row in range(0, 10)] for col in range(0, 10)]
+    second_player_board = [[0 for row in range(0, 10)] for col in range(0, 10)]
 
-abc = [chr(i) for i in range(ord('A'),ord('I')+1)]
-j = 0
-while j < len(abc):
-    f[j+1][0] = abc[j]
-    s[j+1][0] = abc[j]
-    j += 1
+    abc = [chr(i) for i in range(ord('A'), ord('I') + 1)]
+    j = 0
+    while j < len(abc):
+        first_player_board[j + 1][0] = abc[j]
+        second_player_board[j + 1][0] = abc[j]
+        j += 1
 
-num = []
-i = 1
-for i in range(10):
-    f[0][i] = i
-    s[0][i] = i
-    i += 1
-    num.append(str(i))
+    num = []
+    i = 1
+    for i in range(10):
+        first_player_board[0][i] = i
+        second_player_board[0][i] = i
+        i += 1
+        num.append(str(i))
 
-f[0][0] = " "
-s[0][0] = " "
+    first_player_board[0][0] = " "
+    second_player_board[0][0] = " "
+    return first_player_board, second_player_board, abc, num
 
-# possible options for user
-possible_ships = ["carrier","battleship","submarine","destroyer"]
-possible_direction = ["v","h"]
-possible_coordinates = [abc,num]
-length = {"carrier" : 5, "battleship" : 4, "submarine" : 3, "destroyer" : 2}
 
-#storing coordinates of the ships
-first_carrier = []
-first_battleship = []
-first_submarine = []
-first_destroyer = []
+def storing_ships(abc, num):
+    possible_ships = ["carrier", "battleship", "submarine", "destroyer"]
+    possible_direction = ["v", "h"]
+    possible_coordinates = [abc, num]
+    length = {"carrier": 5, "battleship": 4, "submarine": 3, "destroyer": 2}
 
-first_ships = [first_carrier,first_battleship,first_submarine,first_destroyer]
+    # storing coordinates of the ships
+    first_carrier = []
+    first_battleship = []
+    first_submarine = []
+    first_destroyer = []
 
-second_carrier = []
-second_battleship = []
-second_submarine = []
-second_destroyer = []
+    first_ships = [
+        first_carrier,
+        first_battleship,
+        first_submarine,
+        first_destroyer]
 
-second_ships = [second_carrier,second_battleship,second_submarine,second_destroyer]
+    second_carrier = []
+    second_battleship = []
+    second_submarine = []
+    second_destroyer = []
 
-# function creating the board for the user
-def draw_table(board):
-    print("_"*20)
+    second_ships = [
+        second_carrier,
+        second_battleship,
+        second_submarine,
+        second_destroyer]
+    return possible_ships, possible_direction, possible_coordinates, length, first_ships, second_ships
+
+
+# drawing the player's own board
+def draw_own_table(board):
+    print("_" * 20)
     for row in board:
         for col in row:
-            print('\x1b[6;30;44m'+"{}".format(col), end="|" + '\x1b[0m')
+            print('\x1b[6;30;44m' + "{}".format(col), end="|" + '\x1b[0m')
         print(end="\n")
 
+
+# drawing the enemy's board containing the fog of war
 def draw_enemy_table(board):
-    print("_"*20)
+    print("_" * 20)
     for row in range(10):
         for col in range(10):
             if "S" in str(board[int(row)][int(col)]):
-                print('\x1b[6;30;44m'+ "0", end="|" + '\x1b[0m')
+                print('\x1b[6;30;44m' + "0", end="|" + '\x1b[0m')
             elif "M" in str(board[int(row)][int(col)]):
-                print('\x1b[6;30;43m'+"{}".format("M"), end="|" + '\x1b[0m')
+                print('\x1b[6;30;43m' + "{}".format("M"), end="|" + '\x1b[0m')
             else:
-                print('\x1b[6;30;44m'+"{}".format(board[row][col]), end="|" + '\x1b[0m')
+                print('\x1b[6;30;44m' + "{}".format(board[row][col]), end="|" + '\x1b[0m')
         print(end="\n")
 
-def value_check(board,ship_direction,i,x,y):
+
+# check whether the users coordinates make any sense
+def value_check(board, ship_direction, i, x, y, possible_ships, length):
     if "v" in ship_direction:
         for k in range(length[possible_ships[i]]):
-            if board[int(x)+k][int(y)] != 0:
+            if board[int(x) + k][int(y)] != 0:
                 return False
             else:
                 return True
     elif "h" in ship_direction:
         for k in range(length[possible_ships[i]]):
-            if board[int(x)][int(y)+k] != 0:
+            if board[int(x)][int(y) + k] != 0:
                 return False
             else:
                 return True
 
-def ship_check(board,i,ship_direction,x,y):
-    try:
+
+# check whether we can place the ship there
+def ship_check(board, i, ship_direction, x, y, possible_ships, length):
+        def try_again():
+            print("""
+            You can not place your ship there!
+                    """)
+            return "again"
         if "v" == ship_direction:
             if possible_ships[i] in length:
                 k = 0
-                if value_check(board,ship_direction,i,x,y) == True:
+                if value_check(board, ship_direction, i, x, y, possible_ships, length):
                     for k in range(length[possible_ships[i]]):
-                        board[int(x)][int(y)] = '\x1B[0;30;47m' + "S" + '\x1B[0m'
-                        board[int(x)+k][int(y)] = '\x1B[0;30;47m' + "S" + '\x1B[0m'
-                        k += 1
+                        board[int(x)][int(y)] = '\x1B[0;30;47m' + "S" + '\x1b[6;30;44m'
+                        board[int(x) + k][int(y)] = '\x1B[0;30;47m' + "S" + '\x1b[6;30;44m'
                 else:
-                    print("""
-        You can not place your ship there!
-                        """)
-                    return "again"
+                    try_again()
+            else:
+                try_again()
         elif "h" == ship_direction:
             if possible_ships[i] in length:
                 k = 0
-                if value_check(board,ship_direction,i,x,y) == True:
+                if value_check(board, ship_direction, i, x, y, possible_ships, length):
                     for k in range(length[possible_ships[i]]):
-                        board[int(x)][int(y)] = '\x1B[0;30;47m' + "S" + '\x1B[0m'
-                        board[int(x)][int(y)+k] = '\x1B[0;30;47m' + "S" + '\x1B[0m'
-                        k += 1
+                        board[int(x)][int(y)] = '\x1B[0;30;47m' + "S" + '\x1b[6;30;44m'
+                        board[int(x)][int(y) + k] = '\x1B[0;30;47m' + "S" + '\x1b[6;30;44m'
                 else:
-                    print("""
-        You can not place your ship there!
-                """)
-                    return "again"
-    except:
-        print("""
-        You can not place your ship there!
-                """)
-        return "again"
+                    try_again()
+            else:
+                try_again()
+        else:
+            try_again()
 
-def placement(user_ships,board):
+
+def placement(user_ships, board, possible_ships, possible_direction, length, abc, num):
     i = 0
     while i < len(user_ships):
         print('Place your %s' % possible_ships[i])
@@ -120,102 +138,128 @@ def placement(user_ships,board):
         ship_direction = None
         while ship_direction not in possible_direction:
             ship_direction = input("What direction do you want your %s to face(v or h):" % possible_ships[i])
-        
+
         ship_coordinates = input("What should be the starting coordinate of your %s:" % possible_ships[i])
 
-        try:
-            x = [ship_coordinates.split('-', 1)[0]]
-            for character in x:
-                    number = ord(character) -64
-                    x[0] = number
+        x = [ship_coordinates.split('-', 1)[0]]
+        if x[0] in abc:
+            number = ord(x[0]) - 64
+            x[0] = number
             x = "".join(str(e) for e in x)
-            
-            y = [ship_coordinates.split('-', 1)[1]]
-            y = "".join(str(e) for e in y)
-        except:
+        else:
             print("""
-        You can not place your ship there!
+    You can not place your ship there!
                 """)
             continue
-        if ship_check(board,i,ship_direction,x,y) == "again":
-            continue
+
+        y = [ship_coordinates.split('-', 1)[1]]
+        print(y[0])
+        if y[0] in num:
+            y = "".join(str(e) for e in y)
+            if ship_check(board, i, ship_direction, x, y, possible_ships, length) == "again":
+                continue
+            else:
+                pass
         else:
-            pass
+            print("""
+    You can not place your ship there!
+                """)
+            continue
 
         user_ships[i].append(ship_direction)
         user_ships[i].append(x)
         user_ships[i].append(y)
         os.system('clear')
-        draw_table(board)
+        draw_own_table(board)
         i += 1
 
-def hit(board):
-    try:
-        ship_coordinates = input("Where do you want to shoot (e.g. A-2)?" )
+
+def hit(board, num, abc):
+    while True:
+        ship_coordinates = input("Where do you want to shoot (e.g. A-2)?")
         x = [ship_coordinates.split('-', 1)[0]]
-        for character in x:
-                number = ord(character) -64
-                x[0] = number
-        x = "".join(str(e) for e in x)
+        if x[0] in abc:
+            number = ord(x[0]) - 64
+            x[0] = number
+            x = "".join(str(e) for e in x)
+        else:
+            print("""
+        You can not shoot there!
+            """)
+            continue
 
         y = [ship_coordinates.split('-', 1)[1]]
-        y = "".join(str(e) for e in y)
+        if y[0] in num:
+            y = "".join(str(e) for e in y)
+        else:
+            print("""
+        You can not shoot there!
+            """)
+            continue
 
-        if "S" in board[int(x)][int(y)]:
+        if "S" in str(board[int(x)][int(y)]):
             os.system('clear')
             print("You hit the enemy ship!")
-            board[int(x)][int(y)] = '\x1B[0;30;41m' + "X" + '\x1B[0m'
+            board[int(x)][int(y)] = '\x1B[0;30;41m' + "X" + '\x1b[6;30;44m'
             draw_enemy_table(board)
             print("You can shoot again!")
-            hit(board)
-    except:
-        print("You missed!")
-        board[int(x)][int(y)] = '\x1B[0;30;43m' + "M" + '\x1B[0m'
-        draw_enemy_table(board)
+            hit(board, num, abc)
+        else:
+            print("You missed!")
+            board[int(x)][int(y)] = '\x1B[0;30;43m' + "M" + '\x1b[6;30;44m'
+            draw_enemy_table(board)
+
 
 def check_win(board):
-	for i in range(10):
-		for j in range(10):
-			if "S" in str(board[i][j]):
-				return False
-	return True
+    for i in range(10):
+        for j in range(10):
+            if "S" in str(board[i][j]):
+                return False
+    return True
+
 
 def main():
+    first_player_board, second_player_board, abc, num = creating_boards()
+    possible_ships, possible_direction, possible_coordinates, length, first_ships, second_ships = storing_ships(abc,
+                                                                                                                num)
+    print(num)
     # placement phase
     print("Welcome to Our amazing TORpedo simulator, where you can check your battleship skills.")
     print("""First player
-        
+
         """)
-    placement(first_ships,f)
+    placement(first_ships, first_player_board, possible_ships, possible_direction, length, abc, num)
     os.system('clear')
     print("""Second player
-        
+
         """)
-    placement(second_ships,s)
+    placement(second_ships, second_player_board, possible_ships, possible_direction, length, abc, num)
 
     # battle phase
     os.system('clear')
     print("The battle commences NOW!")
     player_one = True
-    while check_win(s) == False and check_win(f) == False:
-        if player_one == True:
-            board = s
+    while not check_win(second_player_board) and not check_win(first_player_board):
+        if player_one:
+            board = second_player_board
             print("First player's turn")
             draw_enemy_table(board)
-            hit(board)
+            hit(board, num, abc)
             check_win(board)
-            if check_win(board) == True:
+            if check_win(board):
                 print("First player WON!!!")
             player_one = False
             continue
-        elif player_one == False:
-            board = f
+        elif not player_one:
+            board = first_player_board
             print("Second player's turn")
             draw_enemy_table(board)
-            hit(board)
+            hit(board, num, abc)
             check_win(board)
-            if check_win(board) == True:
+            if check_win(board):
                 print("Second player WON!!!")
             player_one = True
             continue
+
+
 main()
