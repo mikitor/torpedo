@@ -7,31 +7,32 @@ def creating_boards():
     first_player_board = [[0 for row in range(0, 10)] for col in range(0, 10)]
     second_player_board = [[0 for row in range(0, 10)] for col in range(0, 10)]
 
-    abc = [chr(i) for i in range(ord('A'), ord('I') + 1)]
+    COORDINATE_LETTERS = [chr(i) for i in range(ord('A'), ord('I') + 1)]
     j = 0
-    while j < len(abc):
-        first_player_board[j + 1][0] = abc[j]
-        second_player_board[j + 1][0] = abc[j]
+    while j < len(COORDINATE_LETTERS):
+        first_player_board[j + 1][0] = COORDINATE_LETTERS[j]
+        second_player_board[j + 1][0] = COORDINATE_LETTERS[j]
         j += 1
 
-    num = []
+    COORDINATE_NUMBERS = []
     i = 1
     for i in range(10):
         first_player_board[0][i] = i
         second_player_board[0][i] = i
         i += 1
-        num.append(str(i))
+        COORDINATE_NUMBERS.append(str(i))
 
     first_player_board[0][0] = " "
     second_player_board[0][0] = " "
-    return first_player_board, second_player_board, abc, num
+
+    return first_player_board, second_player_board, COORDINATE_LETTERS, COORDINATE_NUMBERS
 
 
-def storing_ships(abc, num):
-    possible_ships = ["carrier", "battleship", "submarine", "destroyer"]
-    possible_direction = ["v", "h"]
-    possible_coordinates = [abc, num]
-    length = {"carrier": 5, "battleship": 4, "submarine": 3, "destroyer": 2}
+def storing_ships(COORDINATE_LETTERS, COORDINATE_NUMBERS):
+    POSSIBLE_SHIPS = ["carrier", "battleship", "submarine", "destroyer"]
+    POSSIBLE_DIRECTION = ["v", "h"]
+    POSSIBLE_COORDINATES = [COORDINATE_LETTERS, COORDINATE_NUMBERS]
+    SHIP_LENGTH = {"carrier": 5, "battleship": 4, "submarine": 3, "destroyer": 2}
 
     # storing coordinates of the ships
     first_carrier = []
@@ -55,7 +56,7 @@ def storing_ships(abc, num):
         second_battleship,
         second_submarine,
         second_destroyer]
-    return possible_ships, possible_direction, possible_coordinates, length, first_ships, second_ships
+    return POSSIBLE_SHIPS, POSSIBLE_DIRECTION, POSSIBLE_COORDINATES, SHIP_LENGTH, first_ships, second_ships
 
 
 # drawing the player's own board
@@ -82,15 +83,15 @@ def draw_enemy_table(board):
 
 
 # check whether the users coordinates make any sense
-def value_check(board, ship_direction, i, x, y, possible_ships, length):
+def value_check(board, ship_direction, i, x, y, POSSIBLE_SHIPS, SHIP_LENGTH):
     if "v" in ship_direction:
-        for k in range(length[possible_ships[i]]):
+        for k in range(SHIP_LENGTH[POSSIBLE_SHIPS[i]]):
             if board[int(x) + k][int(y)] != 0:
                 return False
             else:
                 return True
     elif "h" in ship_direction:
-        for k in range(length[possible_ships[i]]):
+        for k in range(SHIP_LENGTH[POSSIBLE_SHIPS[i]]):
             if board[int(x)][int(y) + k] != 0:
                 return False
             else:
@@ -98,17 +99,17 @@ def value_check(board, ship_direction, i, x, y, possible_ships, length):
 
 
 # check whether we can place the ship there
-def ship_check(board, i, ship_direction, x, y, possible_ships, length):
+def ship_check(board, i, ship_direction, x, y, POSSIBLE_SHIPS, SHIP_LENGTH):
         def try_again():
             print("""
             You can not place your ship there!
                     """)
             return "again"
         if "v" == ship_direction:
-            if possible_ships[i] in length:
+            if POSSIBLE_SHIPS[i] in SHIP_LENGTH:
                 k = 0
-                if value_check(board, ship_direction, i, x, y, possible_ships, length):
-                    for k in range(length[possible_ships[i]]):
+                if value_check(board, ship_direction, i, x, y, POSSIBLE_SHIPS, SHIP_LENGTH):
+                    for k in range(SHIP_LENGTH[POSSIBLE_SHIPS[i]]):
                         board[int(x)][int(y)] = '\x1B[0;30;47m' + "S" + '\x1b[6;30;44m'
                         board[int(x) + k][int(y)] = '\x1B[0;30;47m' + "S" + '\x1b[6;30;44m'
                 else:
@@ -116,10 +117,10 @@ def ship_check(board, i, ship_direction, x, y, possible_ships, length):
             else:
                 try_again()
         elif "h" == ship_direction:
-            if possible_ships[i] in length:
+            if POSSIBLE_SHIPS[i] in SHIP_LENGTH:
                 k = 0
-                if value_check(board, ship_direction, i, x, y, possible_ships, length):
-                    for k in range(length[possible_ships[i]]):
+                if value_check(board, ship_direction, i, x, y, POSSIBLE_SHIPS, SHIP_LENGTH):
+                    for k in range(SHIP_LENGTH[POSSIBLE_SHIPS[i]]):
                         board[int(x)][int(y)] = '\x1B[0;30;47m' + "S" + '\x1b[6;30;44m'
                         board[int(x)][int(y) + k] = '\x1B[0;30;47m' + "S" + '\x1b[6;30;44m'
                 else:
@@ -130,19 +131,19 @@ def ship_check(board, i, ship_direction, x, y, possible_ships, length):
             try_again()
 
 
-def placement(user_ships, board, possible_ships, possible_direction, length, abc, num):
+def placement(user_ships, board, POSSIBLE_SHIPS, POSSIBLE_DIRECTION, SHIP_LENGTH, COORDINATE_LETTERS, COORDINATE_NUMBERS):
     i = 0
     while i < len(user_ships):
-        print('Place your %s' % possible_ships[i])
+        print('Place your %s' % POSSIBLE_SHIPS[i])
 
         ship_direction = None
-        while ship_direction not in possible_direction:
-            ship_direction = input("What direction do you want your %s to face(v or h):" % possible_ships[i])
+        while ship_direction not in POSSIBLE_DIRECTION:
+            ship_direction = input("What direction do you want your %s to face(v or h):" % POSSIBLE_SHIPS[i])
 
-        ship_coordinates = input("What should be the starting coordinate of your %s:" % possible_ships[i])
+        ship_coordinates = input("What should be the starting coordinate of your %s:" % POSSIBLE_SHIPS[i])
 
         x = [ship_coordinates.split('-', 1)[0]]
-        if x[0] in abc:
+        if x[0] in COORDINATE_LETTERS:
             number = ord(x[0]) - 64
             x[0] = number
             x = "".join(str(e) for e in x)
@@ -154,9 +155,9 @@ def placement(user_ships, board, possible_ships, possible_direction, length, abc
 
         y = [ship_coordinates.split('-', 1)[1]]
         print(y[0])
-        if y[0] in num:
+        if y[0] in COORDINATE_NUMBERS:
             y = "".join(str(e) for e in y)
-            if ship_check(board, i, ship_direction, x, y, possible_ships, length) == "again":
+            if ship_check(board, i, ship_direction, x, y, POSSIBLE_SHIPS, SHIP_LENGTH) == "again":
                 continue
             else:
                 pass
@@ -174,11 +175,11 @@ def placement(user_ships, board, possible_ships, possible_direction, length, abc
         i += 1
 
 
-def hit(board, num, abc):
+def hit(board, COORDINATE_NUMBERS, COORDINATE_LETTERS):
     while True:
         ship_coordinates = input("Where do you want to shoot (e.g. A-2)?")
         x = [ship_coordinates.split('-', 1)[0]]
-        if x[0] in abc:
+        if x[0] in COORDINATE_LETTERS:
             number = ord(x[0]) - 64
             x[0] = number
             x = "".join(str(e) for e in x)
@@ -189,7 +190,7 @@ def hit(board, num, abc):
             continue
 
         y = [ship_coordinates.split('-', 1)[1]]
-        if y[0] in num:
+        if y[0] in COORDINATE_NUMBERS:
             y = "".join(str(e) for e in y)
         else:
             print("""
@@ -203,7 +204,7 @@ def hit(board, num, abc):
             board[int(x)][int(y)] = '\x1B[0;30;41m' + "X" + '\x1b[6;30;44m'
             draw_enemy_table(board)
             print("You can shoot again!")
-            hit(board, num, abc)
+            hit(board, COORDINATE_NUMBERS, COORDINATE_LETTERS)
         else:
             print("You missed!")
             board[int(x)][int(y)] = '\x1B[0;30;43m' + "M" + '\x1b[6;30;44m'
@@ -219,21 +220,20 @@ def check_win(board):
 
 
 def main():
-    first_player_board, second_player_board, abc, num = creating_boards()
-    possible_ships, possible_direction, possible_coordinates, length, first_ships, second_ships = storing_ships(abc,
-                                                                                                                num)
-    print(num)
+    first_player_board, second_player_board, COORDINATE_LETTERS, COORDINATE_NUMBERS = creating_boards()
+    POSSIBLE_SHIPS, POSSIBLE_DIRECTION, POSSIBLE_COORDINATES, SHIP_LENGTH, first_ships, second_ships = storing_ships(COORDINATE_LETTERS,
+                                                                                                                COORDINATE_NUMBERS)
     # placement phase
     print("Welcome to Our amazing TORpedo simulator, where you can check your battleship skills.")
     print("""First player
 
         """)
-    placement(first_ships, first_player_board, possible_ships, possible_direction, length, abc, num)
+    placement(first_ships, first_player_board, POSSIBLE_SHIPS, POSSIBLE_DIRECTION, SHIP_LENGTH, COORDINATE_LETTERS, COORDINATE_NUMBERS)
     os.system('clear')
     print("""Second player
 
         """)
-    placement(second_ships, second_player_board, possible_ships, possible_direction, length, abc, num)
+    placement(second_ships, second_player_board, POSSIBLE_SHIPS, POSSIBLE_DIRECTION, SHIP_LENGTH, COORDINATE_LETTERS, COORDINATE_NUMBERS)
 
     # battle phase
     os.system('clear')
@@ -244,7 +244,7 @@ def main():
             board = second_player_board
             print("First player's turn")
             draw_enemy_table(board)
-            hit(board, num, abc)
+            hit(board, COORDINATE_NUMBERS, COORDINATE_LETTERS)
             check_win(board)
             if check_win(board):
                 print("First player WON!!!")
@@ -254,7 +254,7 @@ def main():
             board = first_player_board
             print("Second player's turn")
             draw_enemy_table(board)
-            hit(board, num, abc)
+            hit(board, COORDINATE_NUMBERS, COORDINATE_LETTERS)
             check_win(board)
             if check_win(board):
                 print("Second player WON!!!")
