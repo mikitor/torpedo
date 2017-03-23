@@ -74,12 +74,12 @@ def draw_enemy_table(board):
     for row in range(10):
         for col in range(10):
             if "S" in str(board[int(row)][int(col)]):
-                print('\x1b[6;30;44m' + "0", end="|" + '\x1b[0m')
+                print('\x1b[6;30;44m' + "0", end="|" + '\x1b[6;30;44m')
             elif "M" in str(board[int(row)][int(col)]):
-                print('\x1b[6;30;43m' + "{}".format("M"), end="|" + '\x1b[0m')
+                print('\x1b[6;30;43m' + "{}".format("M"), end="|" + '\x1b[6;30;44m')
             else:
-                print('\x1b[6;30;44m' + "{}".format(board[row][col]), end="|" + '\x1b[0m')
-        print(end="\n")
+                print('\x1b[6;30;44m' + "{}".format(board[row][col]), end="|" + '\x1b[6;30;44m')
+        print(end="\n" + '\x1b[0m')
 
 
 # check whether the users coordinates make any sense
@@ -204,11 +204,14 @@ def hit(board, COORDINATE_NUMBERS, COORDINATE_LETTERS):
             board[int(x)][int(y)] = '\x1B[0;30;41m' + "X" + '\x1b[6;30;44m'
             draw_enemy_table(board)
             print("You can shoot again!")
-            hit(board, COORDINATE_NUMBERS, COORDINATE_LETTERS)
+            continue
         else:
+            os.system('clear')
             print("You missed!")
             board[int(x)][int(y)] = '\x1B[0;30;43m' + "M" + '\x1b[6;30;44m'
             draw_enemy_table(board)
+            input("Press Enter to continue...")
+            break
 
 
 def check_win(board):
@@ -267,7 +270,7 @@ def main():
     os.system('clear')
     print("""%s's turn
 
-    """ % name_first_player)
+    """ % name_second_player)
     input("Press Enter to continue...")
     os.system('clear')
     placement(second_ships, second_player_board, POSSIBLE_SHIPS, POSSIBLE_DIRECTION, SHIP_LENGTH, COORDINATE_LETTERS, COORDINATE_NUMBERS)
@@ -278,15 +281,15 @@ def main():
     input("Press Enter to continue...")
     os.system('clear')
     player_one = True
-    while not check_win(second_player_board) and not check_win(first_player_board):
-        if player_one:
+    while check_win(second_player_board)  == False and check_win(first_player_board) == False:
+        if player_one == True:
+            os.system('clear')
             board = second_player_board
             print("%s's turn" % name_first_player)
             draw_enemy_table(board)
             hit(board, COORDINATE_NUMBERS, COORDINATE_LETTERS)
             check_win(board)
-            if check_win(board):
-                
+            if check_win(board) == True:
                 print(" /$$$$$$$  /$$                                                /$$          /$$      /$$ /$$$$$$ /$$   /$$")
                 print("| $$__  $$| $$                                               /$$$$        | $$  /$ | $$|_  $$_/| $$$ | $$")
                 print("| $$  \ $$| $$  /$$$$$$  /$$   /$$  /$$$$$$   /$$$$$$       |_  $$        | $$ /$$$| $$  | $$  | $$$$| $$")
@@ -298,16 +301,16 @@ def main():
                 print("                         /$$  | $$                                                                       ")
                 print("                        |  $$$$$$/                                                                       ")
                 print("                         \______/                                                                        ")
-
             player_one = False
             continue
-        elif not player_one:
+        elif player_one == False:
+            os.system('clear')
             board = first_player_board
             print("%s's turn" % name_second_player)
             draw_enemy_table(board)
             hit(board, COORDINATE_NUMBERS, COORDINATE_LETTERS)
             check_win(board)
-            if check_win(board):
+            if check_win(board) == True:
                 print(" /$$$$$$$  /$$                                                /$$$$$$        /$$      /$$ /$$$$$$ /$$   /$$")
                 print("| $$__  $$| $$                                               /$$__  $$      | $$  /$ | $$|_  $$_/| $$$ | $$")
                 print("| $$  \ $$| $$  /$$$$$$  /$$   /$$  /$$$$$$   /$$$$$$       |__/  \ $$      | $$ /$$$| $$  | $$  | $$$$| $$")
