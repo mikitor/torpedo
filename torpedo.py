@@ -221,28 +221,38 @@ def check_win(board):
 
 def main():
     first_player_board, second_player_board, COORDINATE_LETTERS, COORDINATE_NUMBERS = creating_boards()
-    POSSIBLE_SHIPS, POSSIBLE_DIRECTION, POSSIBLE_COORDINATES, SHIP_LENGTH, first_ships, second_ships = storing_ships(COORDINATE_LETTERS,
-                                                                                                                COORDINATE_NUMBERS)
+    POSSIBLE_SHIPS, POSSIBLE_DIRECTION, POSSIBLE_COORDINATES, SHIP_LENGTH, first_ships, second_ships = storing_ships(
+                                                                                    COORDINATE_LETTERS, COORDINATE_NUMBERS)
+
+    name_first_player = str(input("Please give the name of the first player: "))
+    name_second_player = str(input("Please give the name of the second player: "))
+    os.system('clear')
     # placement phase
     print("Welcome to Our amazing TORpedo simulator, where you can check your battleship skills.")
-    print("""First player
+    print("""%s's turn
 
-        """)
+    """ % name_first_player)
+    input("Press Enter to continue...")
+    os.system('clear')
     placement(first_ships, first_player_board, POSSIBLE_SHIPS, POSSIBLE_DIRECTION, SHIP_LENGTH, COORDINATE_LETTERS, COORDINATE_NUMBERS)
     os.system('clear')
-    print("""Second player
+    print("""%s's turn
 
-        """)
+    """ % name_first_player)
+    input("Press Enter to continue...")
+    os.system('clear')
     placement(second_ships, second_player_board, POSSIBLE_SHIPS, POSSIBLE_DIRECTION, SHIP_LENGTH, COORDINATE_LETTERS, COORDINATE_NUMBERS)
 
     # battle phase
     os.system('clear')
     print("The battle commences NOW!")
+    input("Press Enter to continue...")
+    os.system('clear')
     player_one = True
     while not check_win(second_player_board) and not check_win(first_player_board):
         if player_one:
             board = second_player_board
-            print("First player's turn")
+            print("%s's turn" % name_first_player)
             draw_enemy_table(board)
             hit(board, COORDINATE_NUMBERS, COORDINATE_LETTERS)
             check_win(board)
@@ -252,7 +262,7 @@ def main():
             continue
         elif not player_one:
             board = first_player_board
-            print("Second player's turn")
+            print("%s's turn" % name_second_player)
             draw_enemy_table(board)
             hit(board, COORDINATE_NUMBERS, COORDINATE_LETTERS)
             check_win(board)
