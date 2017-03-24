@@ -261,6 +261,8 @@ def main():
     print ("            CARRIER-5 CELL  #####           SUBMARINE-3 CELL  ###                                        ")
     print ("            BATTLESHIP-4 CELL  ####         DESTROYER-2 CELL  ##")
     print ("---------------------------------------------------------------------------------------------")
+    input("Press Enter to continue...")
+    os.system('clear')
     print("""%s's turn
 
     """ % name_first_player)
@@ -281,7 +283,7 @@ def main():
     input("Press Enter to continue...")
     os.system('clear')
     player_one = True
-    while check_win(second_player_board)  == False and check_win(first_player_board) == False:
+    while not check_win(second_player_board) and not check_win(first_player_board):
         if player_one == True:
             os.system('clear')
             board = second_player_board
@@ -302,7 +304,6 @@ def main():
                 print("                        |  $$$$$$/                                                                       ")
                 print("                         \______/                                                                        ")
             player_one = False
-            continue
         elif player_one == False:
             os.system('clear')
             board = first_player_board
@@ -323,7 +324,6 @@ def main():
                 print("                        |  $$$$$$/                                                                         ")
                 print("                         \______/                                                                          ")
             player_one = True
-            continue
 
-
-main()
+if __name__ == "__main__":
+    main()
